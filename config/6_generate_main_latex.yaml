@@ -1,0 +1,6 @@
+path: "/home/datasets4/stein/robust_exp/main_experiment/export/"
+out_path: "/home/datasets4/stein/robust_exp/main_experiment/latex/"
+performance_score: "AUROC Joint"
+what: "mean"
+rounding: [3,2]
+graphs: ["WCG", "INST", "SG_max"] 

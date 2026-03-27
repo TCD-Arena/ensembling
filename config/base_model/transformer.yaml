@@ -1,0 +1,12 @@
+_target_: dl_components.transformer.SimpleTransformer
+
+
+methods: 6
+lag_in: 4
+lag_out: 4
+n_vars: 7
+model_dim: 256
+num_heads: 4
+num_layers: 4
+dropout: 0.1
+pos_embedding_dim: 16

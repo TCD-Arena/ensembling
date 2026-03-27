@@ -1,0 +1,85 @@
+defaults:
+  - _self_
+  #- override hydra/hydra_logging: disabled
+  #- override hydra/job_logging: disabled
+  - base_model: linear.yaml
+  - override hydra/launcher: submitit_slurm
+ 
+
+
+directory: "/home/datasets4/stein/robust_exp/full_search_2/${now:%Y-%m-%d_%H-%M-%S-%f}/"
+logging_interval:
+
+
+
+trainer:
+  _target_: lightning.pytorch.trainer.Trainer
+  #default_root_dir: ${paths.checkpoint_dir} # can be done with more stuff
+  max_epochs: 150
+  accelerator: "auto" #auto
+  devices: auto
+  precision: "16-mixed" # mixed precision for extra speed-up
+  check_val_every_n_epoch: 1
+  #val_check_interval: 0.25
+  deterministic: True
+  enable_checkpointing: True 
+  overfit_batches: 1.0
+  log_every_n_steps: 99999999999999999999
+  gradient_clip_val: 1.0  # Prevent exploding gradients
+  gradient_clip_algorithm: "norm"
+
+
+
+extras:
+  ignore_warnings: False
+  pretty_errors: True
+
+
+tensorboard:
+  _target_: lightning.pytorch.loggers.tensorboard.TensorBoardLogger
+  save_dir: ${directory}
+  name: "null"
+  log_graph: False
+  default_hp_metric: True
+  prefix: ""
+  version: null
+
+seed: 42
+monitor: val_NegSHD
+
+
+model:
+  _target_: dl_components.pl_wrappers.Architecture_PL
+  base_model: ${base_model}
+  loss_type: "bce"  # Changed from mse - binary classification needs BCE
+  optimizer_lr: 3e-4  # Increased slightly for better convergence
+  weight_decay: 0.01
+  positive_weight_bce: 2.5  # TODO: Calculate actual class imbalance ratio
+
+data:
+  _target_: dl_components.pl_wrappers.GeneratorDataModule
+  modus: inst_inst
+  train_ds_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/eval_corrected/small/"
+  val_ds_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/test_corrected/small/"
+  batch_size: 32
+  val_percentage_of_samples_to_use: 0.5
+  normalize_input: True
+
+
+early_stopping: 
+  _target_: lightning.pytorch.callbacks.EarlyStopping
+  patience: 10   # I guess that is already quite a bit?
+  min_delta: 0
+  mode: max
+
+
+
+hydra:
+  launcher: 
+    cpus_per_task: 4
+    #gpus_per_task: 1
+    mem_gb: 8
+    timeout_min: 480
+    gres: shard:2
+    partition: robolab
+    #partition: workstation,robolab 

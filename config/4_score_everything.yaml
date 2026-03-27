@@ -1,0 +1,23 @@
+defaults:
+  - _self_
+
+paths:
+  result_p: "/home/datasets4/stein/robust_exp/release_ensemble_results/test_corrected/"
+  output_dir: "/home/datasets4/stein/robust_exp/release_ensemble_summarized_results/"
+  model_p: "/home/datasets4/stein/robust_exp/release_ensemble_performance/"
+
+experiment:
+  expected_samples: 100
+  verbose: 0
+
+restrict_to: 3
+modus: mean_predictions
+
+
+model: SimpleLinear
+size: small
+
+performance_score: "SHD Joint"
+
+normalize_predictions: True 
+

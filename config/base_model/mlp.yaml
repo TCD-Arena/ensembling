@@ -1,0 +1,9 @@
+_target_: dl_components.mlp.SimpleMLP
+
+methods: 6
+lag_in: 3
+lag_out: 3
+n_vars: 5
+hidden_dims: [3528, 1764]  # Added one more layer with decreasing size
+dropout_rate: 0.2  # Increased from 0.1 for better regularization
+use_batch_norm: true  # Enable batch normalization

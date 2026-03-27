@@ -1,0 +1,8 @@
+data_path: "/home/datasets4/stein/robust_exp/data_release/"
+res_path: "/home/datasets4/stein/robust_exp/release_ensemble_preds/train/WCG/"
+out_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/"
+restrict: null # can be used to only select a subset of datasets
+ignore_ds: [big] #THis is used to only consider equal sizes predictions
+naming: "small"
+
+no_instant_preds: ["direct_crosscorr","var", "pcmci","cp"]

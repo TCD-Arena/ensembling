@@ -1,0 +1,19 @@
+p: "/home/datasets4/stein/robust_exp/"
+model_p:  "full_search_2/"
+out_p: "release_ensemble_summarized_results/best_models/"
+val_ds_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/test_corrected/small/"
+method_selection: "SimpleLinear"
+out_folder: "release_ensemble_performance"
+restrict_violations: null
+modus: "inst_inst"
+
+normalize_input: True
+
+predict: True
+size_selection: 5  # choose number of vars in the dataset (5 = small, 7=big)
+
+rivers_predict: False
+rivers_path: "/home/datasets4/stein/robust_exp/release_ensemble_rivers/processed_predictions.p"
+
+cache: True
+cache_path: "/home/datasets4/stein/robust_exp/release_ensemble_cache/"

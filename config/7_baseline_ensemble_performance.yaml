@@ -1,0 +1,5 @@
+path: /home/datasets4/stein/robust_exp/ensemble_experiment/
+
+tr_data_path: "train.p"
+te_data_path: "test.p"
+
