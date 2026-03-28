@@ -2,8 +2,8 @@
 
 # --- START MODIFICATION ---
 
-data_base_dir="${1:-/home/datasets4/stein/robust_exp/data_release/}" # First argument: base data directory
-output_path="${2:-../ensemble_experiment/ensemble_eval_results/}" # Second argument: output path
+data_base_dir="${1:-data_release/}" # First argument: base data directory
+output_path="${2:-..ensemble_eval_results/}" # Second argument: output path
 skip_first_n="${3:-0}" # Third argument: number of data_paths to skip (default: 0)
 specific_dataset="${4:-}" # Fourth argument: optional specific dataset name
 
@@ -59,23 +59,23 @@ fi
 
 # --- END MODIFICATION ---
 
-cd ../../cd_zoo
+cd ../cd_zoo
 
 cmd="python benchmark.py -m save=True save_predictions=True method="
 cmd2="data_path=$data_base_dir"      # Use the data_base_dir variable
 cmd3="which_dataset='range(0,40)'  save_path=$output_path"
 
 methods=(
-#"direct_crosscorr"
+"direct_crosscorr"
 #"varlingam " #  we skip this as this HP is also the best for INST
 #"var method.base_on=coefficients"
 #"pcmci ci_test=RobustParCorr"
 #"pcmciplus ci_test=RobustParCorr method.reset_lagged_links=False"
 #"dynotears" # we skip this as this HP is also the best for INST
 #"ntsnotears method.h_tol=1e-60 method.rho_max=1e+16 method.lambda1=0.005 method.lambda2=0.01"
-#"cp method.architecture=transformer"
+#"cp method.architecture=transformer" # Skipping CP in the Ensembling as it cannot predict the large dataregimes.
 #"fpcmci  # Same
-"svarrfci ci_test=RobustParCorr"
+#"svarrfci ci_test=RobustParCorr"
 )
 
 

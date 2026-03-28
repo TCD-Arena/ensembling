@@ -3,11 +3,11 @@ defaults:
   #- override hydra/hydra_logging: disabled
   #- override hydra/job_logging: disabled
   - base_model: linear.yaml
-  - override hydra/launcher: submitit_slurm
+  #- override hydra/launcher: submitit_slurm
  
 
 
-directory: "/home/datasets4/stein/robust_exp/full_search_2/${now:%Y-%m-%d_%H-%M-%S-%f}/"
+directory: "full_search/${now:%Y-%m-%d_%H-%M-%S-%f}/"
 logging_interval:
 
 
@@ -59,8 +59,8 @@ model:
 data:
   _target_: dl_components.pl_wrappers.GeneratorDataModule
   modus: inst_inst
-  train_ds_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/eval_corrected/small/"
-  val_ds_path: "/home/datasets4/stein/robust_exp/release_ensemble_results/test_corrected/small/"
+  train_ds_path: "release_ensemble_tensor_data/eval_corrected/small/"
+  val_ds_path: "release_ensemble_tensor_data/test_corrected/small/"
   batch_size: 32
   val_percentage_of_samples_to_use: 0.5
   normalize_input: True
@@ -74,12 +74,12 @@ early_stopping:
 
 
 
-hydra:
-  launcher: 
-    cpus_per_task: 4
-    #gpus_per_task: 1
-    mem_gb: 8
-    timeout_min: 480
-    gres: shard:2
-    partition: robolab
-    #partition: workstation,robolab 
+# hydra:
+#   launcher: 
+#     cpus_per_task: 4
+#     #gpus_per_task: 1
+#     mem_gb: 8
+#     timeout_min: 480
+#     gres: shard:2
+#     partition: robolab
+#     #partition: workstation,robolab 

@@ -1,0 +1,14 @@
+p: /home/datasets4/stein/tcd_arena/ensemble_experiments/
+model_p: best_runs/
+val_ds_path: /home/datasets4/stein/robust_exp/ensemble_experiments/release_ensemble_tensor_data/test_corrected/small/
+method_selection: SimpleMLP
+out_folder: causal_rivers_performance_check
+restrict_violations: null
+modus: wcg_wcg
+normalize_input: true
+predict: true
+size_selection: 5
+rivers_predict: true
+rivers_path: processed_predictions.p
+cache: false
+cache_path: /home/datasets4/stein/robust_exp/release_ensemble_cache/

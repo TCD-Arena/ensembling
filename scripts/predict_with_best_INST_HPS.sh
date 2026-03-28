@@ -2,8 +2,8 @@
 
 # --- START MODIFICATION ---
 
-data_base_dir="${1:-/home/datasets4/stein/robust_exp/data_release/}" # First argument: base data directory
-output_path="${2:-../ensemble_experiment/ensemble_eval_results/}" # Second argument: output path
+data_base_dir="${1:-data_release/}" # First argument: base data directory
+output_path="${2:-..ensemble_eval_results/}" # Second argument: output path
 skip_first_n="${3:-0}" # Third argument: number of data_paths to skip (default: 0)
 specific_dataset="${4:-}" # Fourth argument: optional specific dataset name
 
@@ -60,7 +60,7 @@ fi
 
 # --- END MODIFICATION ---
 
-cd ../../cd_zoo
+cd ../cd_zoo
 
 cmd="python benchmark.py -m save=True save_predictions=True method="
 cmd2="data_path=$data_base_dir"      # Use the data_base_dir variable
@@ -69,11 +69,11 @@ cmd3="which_dataset='range(0,40)'  save_path=$output_path"
 
 
 methods=(
-#"varlingam method.prune=True"
-#"pcmciplus ci_test=ParCorr method.reset_lagged_links=True"
-#"dynotears method.lambda_w=0.1 method.lambda_a=0.1 method.max_iter=100 method.h_tol=0.00001"
-#"ntsnotears method.h_tol=1e-10 method.rho_max=1e+16 method.lambda1=0.005 method.lambda2=0.01"
-#"fpcmci method.ci_test=robust_parcorr" # needs alternative environment
+"varlingam method.prune=True"
+"pcmciplus ci_test=ParCorr method.reset_lagged_links=True"
+"dynotears method.lambda_w=0.1 method.lambda_a=0.1 method.max_iter=100 method.h_tol=0.00001"
+"ntsnotears method.h_tol=1e-10 method.rho_max=1e+16 method.lambda1=0.005 method.lambda2=0.01"
+"fpcmci method.ci_test=robust_parcorr" # needs alternative environment
 "svarrfci ci_test=ParCorr" 
 )
 

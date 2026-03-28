@@ -6,7 +6,7 @@
 
 cd ..
 
-BASE_DIR="/home/datasets4/stein/robust_exp/release_ensemble_results"
+BASE_DIR="/path/to/release_ensemble_tensor_data"
 
 # Parse command line argument
 SELECTED_MODEL="${1:-all}"
@@ -14,9 +14,9 @@ SELECTED_MODEL="${1:-all}"
 # Define configurations
 declare -A configs=(
     ["small_inst"]="base_model.methods=6 base_model.lag_in=1 base_model.lag_out=1 base_model.n_vars=5 data.modus='inst_inst' data.normalize_input=True,False"
-    #["big_inst"]="base_model.methods=6 base_model.lag_in=1 base_model.lag_out=1 base_model.n_vars=7 data.modus='inst_inst' data.normalize_input=True,False"
-    #["small_wcg"]="base_model.methods=9 base_model.lag_in=3 base_model.lag_out=3 base_model.n_vars=5 data.modus='wcg_wcg' data.normalize_input=True,False"
-    #["big_wcg"]="base_model.methods=9 base_model.lag_in=4 base_model.lag_out=4 base_model.n_vars=7 data.modus='wcg_wcg' data.normalize_input=True,False"
+    ["big_inst"]="base_model.methods=6 base_model.lag_in=1 base_model.lag_out=1 base_model.n_vars=7 data.modus='inst_inst' data.normalize_input=True,False"
+    ["small_wcg"]="base_model.methods=9 base_model.lag_in=3 base_model.lag_out=3 base_model.n_vars=5 data.modus='wcg_wcg' data.normalize_input=True,False"
+    ["big_wcg"]="base_model.methods=9 base_model.lag_in=4 base_model.lag_out=4 base_model.n_vars=7 data.modus='wcg_wcg' data.normalize_input=True,False"
 )
 
 # Define dataset sizes for each config

@@ -6,196 +6,136 @@ This directory contains the complete pipeline for training and evaluating ensemb
 
 The pipeline takes predictions from multiple causal discovery methods (generated in the main cd_zoo experiments) and trains ensemble models to combine these predictions optimally. The ensemble models are evaluated on multiple datasets including synthetic violation datasets and Causal Rivers benchmarks.
 
+
+## 👩‍🔬 Using Ensembles
+
+The simplest way to use our ensembles please follow cd_zoo functionality to prepare individual predictions (Step2 below) and transform the predictions into a tensor (You might follow the steps in 6_generate_rivers_dataset.ipynb). YOu can download the weights of the best performing ensembles. After you have the data and the model weights, you can use the 3_predict.py functionality. Notably, depending on your task, you may subselect certain ensembles as we have 12 in total (3 architectures* 5/7 vars * lagged,instantanous effects )
+
+
+```bash
+https://github.com/TCD-Arena/ensembling/releases/download/model_weights/best_ensembles.zip
+```
+
+
 ## Pipeline Steps
 
-### Step 0: Generate Base Method Predictions
 
-Before running the ensembling pipeline, you need predictions from individual causal discovery methods on all datasets (train/val).
+1. Generate training data
+2. predict the full training data with best Hyperparameter configuration found in the main experiment
+3. Train ensembles
+4. select the highest scoring training run and predict with it
+5. Evaluate the performance of the prediction.
 
-**Run these to predict datasets with the best HP configuration from the main study (Either based on LWCG or on the INSTANTANOUS predictions):**
+
+### Step 0: Generate Training data: 
+
+For training, we leverage the synth_ds_generator of TCD-arena to train an additional dataset that contains all 33 violations: 
+
 ```bash
-cd scripts
-./predict_with_best_WCG_HPS.sh /path/to/violation/datasets/ /path/to_prediction/saves/
-./predict_with_best_INST_HPS.sh /path/to/violation/datasets/ /path/to_prediction/saves/
+../synthetic_ds_generator/create_all_violations_datasets 123  /path/to/save/train_data_release # We use the seed 123 for training data
+
+```
+
+### Step 2: Generate predictions for all datasets: 
+
+In our study, we precalculated all predictions beforehand with the best performing Hyperparameter configurations (once for instantanous and once for lagged effects) from the main experiment. This can be done by running:
+
+```bash
+# Arguments: Path to data, path_to_output_folder, number of datasets to skip
+./predict_with_best_WCG_HPS.sh --/data_release/ release_ensemble_preds/test/WCG/ 0 
+./predict_with_best_INST_HPS.sh ../data_release/ release_ensemble_preds/test/INST/ 0 
+./predict_with_best_WCG_HPS.sh /path/to/save/train_data_release/ release_ensemble_preds/train/WCG/ 0 
+./predict_with_best_INST_HPS.sh /path/to/save/train_data_release release_ensemble_preds/train/INST/ 0 
+```
+
+
+### Step 2: Prepare the raw predictions and labels into a training format: 
+
+We transfer into Tensor datasets that we can easily load for training. Notably, we need train different ensembles for the different data sizes to keep the input format consistent:
+
+```bash
+python 1_transform_to_training_set.py -m data_path="../data_release/" res_path="release_ensemble_preds/test/WCG/","release_ensemble_preds/test/INST/" ignore_ds="[small]" naming="big" out_path="release_ensemble_tensor_data/"
+python 1_transform_to_training_set.py data_path="train_data_release/" res_path="release_ensemble_preds/test/WCG/","release_ensemble_preds/test/INST/" ignore_ds="[big]" naming="small" out_path="release_ensemble_tensor_data/"
+python 1_transform_to_training_set.py data_path="train_data_release/" res_path="release_ensemble_preds/train/WCG/","release_ensemble_preds/train/INST/" ignore_ds="[small]" naming="big" out_path="release_ensemble_tensor_data/"
+python 1_transform_to_training_set.py data_path="train_data_release/" res_path="release_ensemble_preds/train/WCG/","release_ensemble_preds/train/INST/" ignore_ds="[big]" naming="small" out_path="release_ensemble_tensor_data/"
 
 ```
 
 
----
+### Step 3: Train Ensemble approaches: 
 
-### Step 1: Transform Predictions to Training Sets
+We run a grid search for all model types. Notably this likely requires a cluster. 
+Therefore, we provide the best performing model for each Architecture as a release
+We use the cd_zoo_torch environment for training.
 
-**Script:** `1_transform_to_training_set.py`
-
-Transforms the raw prediction files from individual methods into tensor datasets that can be loaded by PyTorch DataLoaders for training ensemble models.
-
-**What it does:**
-- Loads predictions from all methods across multiple dataset runs
-- Organizes predictions into a structured format (lagged and instantaneous predictions)
-- Saves processed data as pickle files for loading during training
-
-**Command to run:**
 ```bash
-python 1_transform_to_training_set.py  data_path=/path/to/violation/datasets/ res_path=/path/to_prediction/saves/INST/
+# We document the grid search here:
+./scripts/model_grid_search.sh
+```
+
+```bash
+# A single training run can be executed with (pathing must be configured):
+    python 2_train_ensembles.py
+```
+
+
+### Step 4: Use the best performing Ensemble to predict the test data: 
+
+```bash
+# A single training run can be executed with (pathing must be configured):
+   python 3_predict.py -m predict=True method_selection=SimpleLinear,SimpleTransformer,SimpleMLP modus=wcg_wcg,inst_inst size_selection=7 out_folder=reproduce_performance val_ds_path="path/to/ensemble_experiments/release_ensemble_tensor_data/test_corrected/big/" 
+   python 3_predict.py -m predict=True method_selection=SimpleLinear,SimpleTransformer,SimpleMLP modus=wcg_wcg,inst_inst size_selection=7 out_folder=reproduce_performance val_ds_path="path/to/ensemble_experiments/release_ensemble_tensor_data/test_corrected/big/" 
+```
+
+### Step 5: Use the predictions to validate performance: 
+
+Note this function is also computing the mean ensemble from the raw tensor predictions and provides functionality to select single methods from the tensor data to control for consistency between the robustness and ensembling experiments
+
+```bash
+# A single training run can be executed with (pathing must be configured):
+python 4_score_everything.py -m modus="model_predictions" performance_score="SHD individual" model=SimpleMLP restrict_to=-1 size=small normalize_predictions=True
 
 ```
 
 
-### Step 2: Train Ensemble Models
+### Step 5: Summarize the results:
 
-**Script:** `2_train_ensembles.py`
+In 5_produce_ensemble_results.ipynb we export the results for all ensembles along sanity checks and visualizations
 
-Trains deep learning ensemble architectures (Linear, MLP, Transformer) on the training predictions to learn optimal combination strategies.
 
-**What it does:**
-- Loads training data using PyTorch Lightning DataModule
-- Trains neural network models to combine method predictions
-- Saves model checkpoints and training logs
 
-**Command to run:**
+### Step 6: Causal Rivers:
+
+We recycle a number of functionalities from other packages here: 
 ```bash
-# TODO: Add your command here
+# Run to generate raw predictions with cd_zoo functionality. Please follow the causal rivers integration in the main cd_zoo repository first
+./predict_for_causal_rivers.sh
 ```
 
-**Helper script:** `scripts/train_all_ensembles.sh` - Trains multiple ensemble architectures with different hyperparameters
+After this, we can generate the summarized results via TCD-Arena functionality
 
-**Available ensemble architectures:**
-- `Linear`: Simple linear combination of predictions
-- `MLP`: Multi-layer perceptron 
-- `ConvMixer`: Convolutional mixing architecture
-- `Transformer`: Transformer-based ensemble
-
----
-
-### Step 3: Generate Predictions with Trained Ensembles
-
-**Script:** `3_predict.py`
-
-Uses trained ensemble models to generate predictions on test/validation datasets.
-
-**What it does:**
-- Loads the best performing ensemble models (based on validation AUROC)
-- Generates predictions for all test samples
-- Saves predictions for downstream evaluation
-
-**Command to run:**
 ```bash
-# TODO: Add your command here
+python 1_extract_results.py  res_path="path_to/causal_rivers_method_predictions/" out_path="rivers_output_path/"  automated_testing=False ignore_passed=False load_data_hps=False 
 ```
 
----
+We then generate a simple dataset in 6_generatee_rivers_dataset,ipynb
 
-### Step 4: Score and Evaluate Ensemble Performance
+Next we predict via this dataset with the best ensembles:
 
-**Script:** `4_score_everything.py`
-
-Computes performance metrics (AUROC, etc.) for all ensemble predictions and compares against individual methods.
-
-**What it does:**
-- Loads predictions from ensemble models and baseline methods
-- Calculates performance metrics for each dataset
-- Aggregates results across multiple runs and datasets
-- Saves scoring results for analysis and visualization
-
-**Command to run:**
 ```bash
-# TODO: Add your command here
+python 3_predict.py -m  predict=True method_selection=SimpleMLP,SimpleLinear,SimpleTransformer modus=wcg_wcg size_selection=5 out_p="release_ensemble_rivers/ensemble_predictions" rivers_predict=True cache=False out_folder="release_rivers_ensemble_performance_reproduce" out_folder=causal_rivers_performance_reproduce
 ```
+Finally, in 7_performance_on_causarivers.ipynb, we evaluate the performance of these predictions
 
----
 
-### Step 7: Predict with Best Methods
-
-**Script:** `7_predict_with_best_methods.py`
-
-Generates predictions using the best performing ensemble configurations identified in the validation phase.
-
-**What it does:**
-- Selects top-performing ensemble models based on validation metrics
-- Generates final test set predictions
-- Compares ensemble performance against individual baseline methods
-- Computes detailed performance statistics
-
-**Command to run:**
-```bash
-# TODO: Add your command here
-```
-
----
-
-### Step 9: Apply to Causal Rivers Benchmark
-
-**Script:** `9_use_best_to_predict_cr.py`
-
-Applies the best ensemble models to the Causal Rivers benchmark datasets to evaluate generalization performance.
-
-**What it does:**
-- Loads predictions from methods on Causal Rivers datasets
-- Applies trained ensemble models to combine these predictions
-- Evaluates ensemble performance on real-world benchmarks
-- Compares ensemble results against individual method performance
-
-**Command to run:**
-```bash
-# TODO: Add your command here
-```
-
----
-
-## Additional Utilities
-
-### Mean Ensemble Baseline
-
-**Notebook:** `10_mean_ensemble.ipynb`
-
-Implements and evaluates a simple mean ensemble (averaging predictions) as a baseline comparison.
-
-### Pipeline Orchestration
-
-**Notebooks:**
-- `ensemble_pipeline.ipynb`: Interactive pipeline exploration
-- `prepare_rivers.ipynb`: Preparation of Causal Rivers data for ensemble evaluation
-- `dl_check.ipynb`: Deep learning component validation
-
-### Helper Scripts
-
-Located in `scripts/`:
-- `train_all_ensembles.sh`: Batch training of multiple ensemble configurations
-- `transform_all_sets.sh`: Batch transformation of datasets
-- `predict_with_best_WCG_HPS.sh`: Prediction with best WCG hyperparameters
-- `predict_with_best_INST_HPS.sh`: Prediction with best instantaneous hyperparameters  
-- `predict_for_causal_rivers.sh`: Generate predictions for Causal Rivers benchmarks
-
-## Configuration
-
-All scripts use Hydra for configuration management. Config files are located in `config/`:
-- `1_transform_to_training_set.yaml`
-- `2_train_ensembles.yaml`
-- `3_predict.yaml`
-- `4_score_everything.yaml`
-- `base_model/`: Individual ensemble architecture configs
-
-## Output Structure
-
-- `outputs/`: Hydra output logs and run metadata
-- Training results and model checkpoints from step 2
-- Prediction files from steps 3, 7, and 9
-- Performance metrics from step 4
-
-## Dependencies
-
-- PyTorch & PyTorch Lightning
-- Hydra for configuration
-- pandas, numpy for data processing
-- scikit-learn for metrics
-- Custom components in `dl_components/`
 
 ## Notes
 
 - Ensemble models require predictions from multiple base methods to be effective
 - Training is performed separately for different dataset configurations (5 vs 7 variables, different max lags)
-- Model selection uses validation AUROC as the primary metric
+- Model selection and checkpoint saving rely on validation negative SHD.
 - The pipeline supports both WCG (weighted causal graph) and INST (instantaneous) graph types
+- This is research code. If you have trouble getting your own ensembles to work, feel free to contact us.
 
 
 

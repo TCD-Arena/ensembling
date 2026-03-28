@@ -13,7 +13,7 @@ from torchmetrics import MeanSquaredError, MeanAbsoluteError, Metric
 from torchmetrics.classification import BinaryAUROC
 import torch.nn.functional as F
 import sys
-sys.path.append('/home/stein/project_repos/tcd_arena')
+sys.path.append("..")
 from cd_zoo.tools.scoring_tools import min_shd
 
 

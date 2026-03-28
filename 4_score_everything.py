@@ -203,8 +203,6 @@ def main(cfg: DictConfig):
 
     elif cfg.modus == "mean_predictions":
 
-                
-        
         # we need varlingam, dynotears and fpcmci get the indices from the ordering for them:
         varlingam_idx = method_ordering_inst_wcg.index("varlingam")
         dynotears_idx = method_ordering_inst_wcg.index("dynotears")
