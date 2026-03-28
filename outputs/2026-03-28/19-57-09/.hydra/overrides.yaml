@@ -1,9 +1,0 @@
-- predict=True
-- method_selection=SimpleMLP
-- modus=wcg_wcg
-- size_selection=5
-- rivers_predict=True
-- cache=False
-- out_folder=release_rivers_ensemble_performance_reproduce
-- out_folder=causal_rivers_performance_check
-- p=/home/datasets4/stein/tcd_arena/ensemble_experiments/
