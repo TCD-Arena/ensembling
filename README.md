@@ -2,18 +2,14 @@
 
 This directory contains the complete pipeline for training and evaluating ensemble methods that combine predictions from multiple causal discovery methods. The ensembling approach aims to improve performance over individual methods by leveraging their complementary strengths.
 
-## Overview
-
-The pipeline takes predictions from multiple causal discovery methods (generated in the main cd_zoo experiments) and trains ensemble models to combine these predictions optimally. The ensemble models are evaluated on multiple datasets including synthetic violation datasets and Causal Rivers benchmarks.
-
 
 ## 👩‍🔬 Using Ensembles
 
-The simplest way to use our ensembles please follow cd_zoo functionality to prepare individual predictions (Step2 below) and transform the predictions into a tensor (You might follow the steps in 6_generate_rivers_dataset.ipynb). YOu can download the weights of the best performing ensembles.
+The simplest way to use our ensembles: Please follow the cd_zoo functionality to prepare individual predictions (Step 2 below) and transform the predictions into a tensor (You might follow the steps in 6_generate_rivers_dataset.ipynb). You can download the weights of the best-performing ensembles (see below)
 
 After you have the data and the model weights, you can use the 3_predict.py functionality. 
 
-Notably, depending on your task, you may subselect certain ensembles as we have 12 in total (3 architectures* 5/7 vars * lagged,instantanous effects )
+Notably, depending on your task, you may subselect certain ensembles as we have 12 in total (3 architectures* 5/7 vars * lagged, instantaneous effects )
 
 
 ```bash
