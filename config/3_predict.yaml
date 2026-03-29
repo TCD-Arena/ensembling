@@ -1,5 +1,5 @@
 p: "" #path where previous results all previous products are stoed.
-model_p:  "best_runs/"
+model_p:  "best_ensembles/"
 val_ds_path: "release_ensemble_tensor_data/test_corrected/small/" #data path for the labels
 method_selection: "SimpleLinear"
 out_folder: "release_ensemble_performance"

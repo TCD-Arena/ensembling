@@ -9,11 +9,15 @@ The pipeline takes predictions from multiple causal discovery methods (generated
 
 ## 👩‍🔬 Using Ensembles
 
-The simplest way to use our ensembles please follow cd_zoo functionality to prepare individual predictions (Step2 below) and transform the predictions into a tensor (You might follow the steps in 6_generate_rivers_dataset.ipynb). YOu can download the weights of the best performing ensembles. After you have the data and the model weights, you can use the 3_predict.py functionality. Notably, depending on your task, you may subselect certain ensembles as we have 12 in total (3 architectures* 5/7 vars * lagged,instantanous effects )
+The simplest way to use our ensembles please follow cd_zoo functionality to prepare individual predictions (Step2 below) and transform the predictions into a tensor (You might follow the steps in 6_generate_rivers_dataset.ipynb). YOu can download the weights of the best performing ensembles.
+
+After you have the data and the model weights, you can use the 3_predict.py functionality. 
+
+Notably, depending on your task, you may subselect certain ensembles as we have 12 in total (3 architectures* 5/7 vars * lagged,instantanous effects )
 
 
 ```bash
-https://github.com/TCD-Arena/ensembling/releases/download/model_weights/best_ensembles.zip
+wget https://github.com/TCD-Arena/ensembling/releases/download/model_weights/best_ensembles.zip
 ```
 
 

@@ -2,9 +2,9 @@ defaults:
   - _self_
 
 paths:
-  result_p: "release_ensemble_tensor_data/test_corrected/"
-  output_dir: "release_ensemble_summarized_results/"
-  model_p: "release_ensemble_performance/"
+  result_p: "ensemble_experiments/release_ensemble_tensor_data/test_corrected/"
+  output_dir: "ensemble_experiments/release_ensemble_summarized_results/ensemble_predictions/"
+  model_p: "ensemble_experiments/reproduce_performance/"
 
 experiment:
   expected_samples: 100

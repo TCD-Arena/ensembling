@@ -29,16 +29,13 @@ if __name__ == "__main__" or "hydra" in sys.modules:
 from cd_zoo.tools.scoring_tools import score
 
 
-
-
-
-def clip_and_normalize( X):
+def clip_and_normalize(X):
     """
     Clip values to 2 standard deviations and normalize for each method independently.
     X shape: (batch, method, var, var, lag) or (batch, method, var, var)
     Each method slice is normalized independently over all other dimensions.
     """
-    
+
     X = np.array(X)
     n_methods = X.shape[1]
     X_normalized = np.zeros_like(X)
@@ -162,12 +159,18 @@ def main(cfg: DictConfig):
             out_Y_inst_inst,
             out_meta_inst_inst,
             method_ordering_inst_inst,
-        ) = pickle.load(open(cfg.paths.result_p + cfg.size +  "/INST_inst_results.p", "rb"))
+        ) = pickle.load(
+            open(cfg.paths.result_p + cfg.size + "/INST_inst_results.p", "rb")
+        )
         (X_inst_wcg, out_Y_inst_wcg, out_meta_inst_wcg, method_ordering_inst_wcg) = (
-            pickle.load(open(cfg.paths.result_p + cfg.size +  "/INST_wcg_results.p", "rb"))
+            pickle.load(
+                open(cfg.paths.result_p + cfg.size + "/INST_wcg_results.p", "rb")
+            )
         )
         (X_wcg_wcg, out_Y_wcg_wcg, out_meta_wcg_wcg, method_ordering_wcg_wcg) = (
-            pickle.load(open(cfg.paths.result_p + cfg.size +  "/WCG_wcg_results.p", "rb"))
+            pickle.load(
+                open(cfg.paths.result_p + cfg.size + "/WCG_wcg_results.p", "rb")
+            )
         )
 
         # Integrity check
@@ -202,7 +205,6 @@ def main(cfg: DictConfig):
         )
 
     elif cfg.modus == "mean_predictions":
-
         # we need varlingam, dynotears and fpcmci get the indices from the ordering for them:
         varlingam_idx = method_ordering_inst_wcg.index("varlingam")
         dynotears_idx = method_ordering_inst_wcg.index("dynotears")
@@ -213,18 +215,14 @@ def main(cfg: DictConfig):
             [torch.tensor(X_wcg_wcg), torch.tensor(X_wcg_2)], dim=1
         ).float()
 
-
         if cfg.normalize_predictions:
             X_wcg = clip_and_normalize(X_wcg)
             X_inst_inst = clip_and_normalize(X_inst_inst)
-            
-            
+
         predictions = np.array(X_wcg.mean(axis=1))
         predictions_inst = np.array(X_inst_inst.mean(axis=1))
 
-        save_path = os.path.join(
-            cfg.paths.output_dir, "mean_predictions", cfg.size
-        )
+        save_path = os.path.join(cfg.paths.output_dir, "mean_predictions", cfg.size)
 
     elif cfg.modus == "consistency_test":
         print(method_ordering_inst_inst, method_ordering_wcg_wcg)
